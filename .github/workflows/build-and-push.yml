@@ -36,7 +36,7 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
-            - name: Set up JDK
+      - name: Set up JDK
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
