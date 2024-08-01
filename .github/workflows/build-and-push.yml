@@ -68,9 +68,10 @@ jobs:
         run: sudo chmod +x ./android/gradlew
       - name: Check uname and xargs availability
         run: |
-          echo $PATH
-          which uname
-          which xargs
+          ls -l /usr/bin/uname
+          ls -l /usr/bin/xargs
+          uname
+          xargs --version
 
       - name: Build React Native app
         env:
@@ -78,6 +79,8 @@ jobs:
           PATH: ${{ runner.temp }}/android-sdk/platform-tools:${{ runner.temp }}/android-sdk/cmdline-tools/latest/bin:${{ runner.temp }}/android-sdk/build-tools/34.0.0:${{ env.PATH }}
         run: |
           cd android
+          /usr/bin/uname -a
+          /usr/bin/xargs --version
           ./gradlew assembleRelease
 
       - name: Set up Docker Buildx
