@@ -75,6 +75,7 @@ jobs:
 
       - name: Create gradlew wrapper script
         run: |
+          cd android
           echo '#!/bin/bash' > run_gradlew.sh
           echo 'export PATH=/usr/bin:$PATH' >> run_gradlew.sh
           echo './gradlew "$@"' >> run_gradlew.sh
