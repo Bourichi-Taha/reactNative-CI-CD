@@ -21,7 +21,7 @@ jobs:
       - name: Install essential utilities
         run: |
           sudo apt-get update
-          sudo apt-get install -y coreutils xargs unzip
+          sudo apt-get install -y coreutils unzip
 
       - name: Cache yarn dependencies
         uses: actions/cache@v3
@@ -65,7 +65,7 @@ jobs:
           $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
 
       - name: Grant execution permissions for Gradle wrapper
-        run: chmod +x ./android/gradlew
+        run: sudo chmod +x ./android/gradlew
 
       - name: Build React Native app
         env:
@@ -73,7 +73,7 @@ jobs:
           PATH: ${{ runner.temp }}/android-sdk/platform-tools:${{ runner.temp }}/android-sdk/cmdline-tools/latest/bin:${{ runner.temp }}/android-sdk/build-tools/34.0.0:${{ env.PATH }}
         run: |
           cd android
-          ./gradlew assembleRelease
+          sudo ./gradlew assembleRelease
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
