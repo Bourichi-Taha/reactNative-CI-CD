@@ -36,11 +36,11 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
-      - name: Set up JDK
+            - name: Set up JDK
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
-          java-version: '11'
+          java-version: '17'
 
       - name: Cache Android SDK
         id: cache-android-sdk
