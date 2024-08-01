@@ -53,20 +53,10 @@ jobs:
           unset ANDROID_SDK_ROOT
 
       - name: Print environment variables
-        run: env
-      - name: Install Android SDK
-        env:
-          ANDROID_HOME: ${{ runner.temp }}/android-sdk
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y wget
-          mkdir -p $ANDROID_HOME
-          wget -q "https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip" -O android_cmd_tools.zip
-          unzip android_cmd_tools.zip -d $ANDROID_HOME/cmdline-tools
-          mv $ANDROID_HOME/cmdline-tools/cmdline-tools $ANDROID_HOME/cmdline-tools/latest
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses
-          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --update
-          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
+        run: env                
+
+      - name: Setup Android SDK Tools
+        uses: android-actions/setup-android@v3.2.1
 
       - name: Grant execution permissions for Gradle wrapper
         run: sudo chmod +x ./android/gradlew
@@ -76,21 +66,13 @@ jobs:
           cd android
           echo '#!/bin/bash' > run_gradlew.sh
           echo 'export PATH=/usr/bin:$PATH' >> run_gradlew.sh
-          echo 'export ANDROID_HOME=${ANDROID_HOME}' >> run_gradlew.sh
           echo './gradlew "$@"' >> run_gradlew.sh
           chmod +x run_gradlew.sh
-      - name: Unset ANDROID_SDK_ROOT 2
-        run: |
-          unset ANDROID_SDK_ROOT
-          echo "ANDROID_SDK_ROOT: $ANDROID_SDK_ROOT"
           
       - name: Build React Native app
-        env:
-          ANDROID_HOME: ${{ runner.temp }}/android-sdk
-          PATH: ${{ runner.temp }}/android-sdk/platform-tools:${{ runner.temp }}/android-sdk/cmdline-tools/latest/bin:${{ runner.temp }}/android-sdk/build-tools/34.0.0:${{ env.PATH }}
         run: |
           cd android
-          ANDROID_SDK_ROOT="" ./run_gradlew.sh assembleRelease
+          ./run_gradlew.sh assembleRelease
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
