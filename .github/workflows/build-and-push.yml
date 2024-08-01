@@ -77,7 +77,10 @@ jobs:
           echo 'export ANDROID_HOME=${ANDROID_HOME}' >> run_gradlew.sh
           echo './gradlew "$@"' >> run_gradlew.sh
           chmod +x run_gradlew.sh
-
+      - name: Unset ANDROID_SDK_ROOT 2
+        run: |
+          unset ANDROID_SDK_ROOT
+          
       - name: Build React Native app
         env:
           ANDROID_HOME: ${{ runner.temp }}/android-sdk
