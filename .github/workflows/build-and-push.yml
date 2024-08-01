@@ -21,7 +21,7 @@ jobs:
       - name: Install essential utilities
         run: |
           sudo apt-get update
-          sudo apt-get install -y coreutils unzip
+          sudo apt-get install -y coreutils findutils unzip wget
 
       - name: Cache yarn dependencies
         uses: actions/cache@v3
