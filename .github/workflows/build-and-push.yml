@@ -51,7 +51,6 @@ jobs:
       - name: Unset ANDROID_SDK_ROOT
         run: |
           unset ANDROID_SDK_ROOT
-          env.unset ANDROID_SDK_ROOT
 
       - name: Print environment variables
         run: env
@@ -78,6 +77,7 @@ jobs:
           echo '#!/bin/bash' > run_gradlew.sh
           echo 'export PATH=/usr/bin:$PATH' >> run_gradlew.sh
           echo 'export ANDROID_HOME=${ANDROID_HOME}' >> run_gradlew.sh
+          echo 'export ANDROID_SDK_ROOT=""' >> run_gradlew.sh
           echo './gradlew "$@"' >> run_gradlew.sh
           chmod +x run_gradlew.sh
       - name: Unset ANDROID_SDK_ROOT 2
@@ -91,7 +91,7 @@ jobs:
           PATH: ${{ runner.temp }}/android-sdk/platform-tools:${{ runner.temp }}/android-sdk/cmdline-tools/latest/bin:${{ runner.temp }}/android-sdk/build-tools/34.0.0:${{ env.PATH }}
         run: |
           cd android
-          ANDROID_HOME=${ANDROID_HOME} ./run_gradlew.sh assembleRelease
+          ANDROID_HOME=${ANDROID_HOME} ANDROID_SDK_ROOT="" ./run_gradlew.sh assembleRelease
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
