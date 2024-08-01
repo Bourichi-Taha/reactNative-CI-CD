@@ -18,6 +18,21 @@ jobs:
         with:
           node-version: 18
 
+      - name: Install essential utilities
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y coreutils xargs unzip
+
+      - name: Cache yarn dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.yarn/cache
+            node_modules
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
       - name: Install dependencies
         run: yarn install
 
@@ -27,12 +42,20 @@ jobs:
           distribution: 'temurin'
           java-version: '11'
 
+      - name: Cache Android SDK
+        id: cache-android-sdk
+        uses: actions/cache@v3
+        with:
+          path: ${{ runner.temp }}/android-sdk
+          key: ${{ runner.os }}-android-sdk
+
       - name: Install Android SDK
+        if: steps.cache-android-sdk.outputs.cache-hit != 'true'
         env:
           ANDROID_SDK_ROOT: ${{ runner.temp }}/android-sdk
         run: |
           sudo apt-get update
-          sudo apt-get install -y wget unzip
+          sudo apt-get install -y wget
           mkdir -p $ANDROID_SDK_ROOT
           wget -q "https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip" -O android_cmd_tools.zip
           unzip android_cmd_tools.zip -d $ANDROID_SDK_ROOT/cmdline-tools
@@ -42,7 +65,7 @@ jobs:
           $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
 
       - name: Grant execution permissions for Gradle wrapper
-        run: sudo chmod +x ./android/gradlew
+        run: chmod +x ./android/gradlew
 
       - name: Build React Native app
         env:
