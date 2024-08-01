@@ -47,6 +47,7 @@ jobs:
           PATH: ${{ runner.temp }}/android-sdk/platform-tools:${{ runner.temp }}/android-sdk/cmdline-tools/latest/bin:${{ runner.temp }}/android-sdk/build-tools/34.0.0:${{ env.PATH }}
         run: |
           cd android
+          chmod +x gradlew
           ./gradlew assembleRelease
 
       - name: Set up Docker Buildx
