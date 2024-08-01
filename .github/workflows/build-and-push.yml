@@ -21,13 +21,30 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
-      - name: Install Android SDK
-        uses: malynovskyi/setup-android-sdk@v1
+      - name: Set up JDK
+        uses: actions/setup-java@v3
         with:
-          api-levels: 34
-          build-tools: 34.0.0
+          distribution: 'temurin'
+          java-version: '11'
+
+      - name: Install Android SDK
+        env:
+          ANDROID_SDK_ROOT: ${{ runner.temp }}/android-sdk
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget unzip
+          mkdir -p $ANDROID_SDK_ROOT
+          wget -q "https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip" -O android_cmd_tools.zip
+          unzip android_cmd_tools.zip -d $ANDROID_SDK_ROOT/cmdline-tools
+          mv $ANDROID_SDK_ROOT/cmdline-tools/cmdline-tools $ANDROID_SDK_ROOT/cmdline-tools/latest
+          yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --licenses
+          $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --update
+          $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
 
       - name: Build React Native app
+        env:
+          ANDROID_HOME: ${{ runner.temp }}/android-sdk
+          PATH: ${{ runner.temp }}/android-sdk/platform-tools:${{ runner.temp }}/android-sdk/cmdline-tools/latest/bin:${{ runner.temp }}/android-sdk/build-tools/34.0.0:${{ env.PATH }}
         run: |
           cd android
           ./gradlew assembleRelease
@@ -46,7 +63,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/reactnative:cicd
+          tags: ${{ secrets.DOCKER_USERNAME }}/myapp:latest
 
       - name: Logout from Docker Hub
         run: docker logout
