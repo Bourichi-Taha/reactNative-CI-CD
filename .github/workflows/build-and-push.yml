@@ -67,11 +67,11 @@ jobs:
         run: |
           cd android
           ./run_gradlew.sh assembleRelease
-          
+
       - name: Archive APK
         uses: actions/upload-artifact@v3
         with:
-          name: app-release.apk
+          name: app-release.apk 
           path: android/app/build/outputs/apk/release/app-release.apk
 
       - name: Set up Docker Buildx
