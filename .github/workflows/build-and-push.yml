@@ -66,7 +66,15 @@ jobs:
 
       - name: Grant execution permissions for Gradle wrapper
         run: sudo chmod +x ./android/gradlew
+      - name: Check uname and xargs availability
+        run: |
+          echo $PATH
+          which uname
+          which xargs
 
+      - name: Install xargs explicitly
+        run: sudo apt-get install -y xargs
+        
       - name: Build React Native app
         env:
           ANDROID_HOME: ${{ runner.temp }}/android-sdk
