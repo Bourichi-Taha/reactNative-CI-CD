@@ -65,12 +65,6 @@ jobs:
 
       - name: Grant execution permissions for Gradle wrapper
         run: sudo chmod +x ./android/gradlew
-      - name: Check uname and xargs availability
-        run: |
-          ls -l /usr/bin/uname
-          ls -l /usr/bin/xargs
-          uname
-          xargs --version
 
       - name: Create gradlew wrapper script
         run: |
@@ -87,7 +81,7 @@ jobs:
           PATH: ${{ runner.temp }}/android-sdk/platform-tools:${{ runner.temp }}/android-sdk/cmdline-tools/latest/bin:${{ runner.temp }}/android-sdk/build-tools/34.0.0:${{ env.PATH }}
         run: |
           cd android
-          ./run_gradlew.sh assembleRelease
+          ANDROID_HOME=${ANDROID_HOME} ./run_gradlew.sh assembleRelease
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
