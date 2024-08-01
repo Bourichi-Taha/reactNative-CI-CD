@@ -89,7 +89,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/reactnative:emptyApp2
+          tags: ${{ secrets.DOCKER_USERNAME }}/reactnative:emptyApp3
 
       - name: Logout from Docker Hub
         run: docker logout
