@@ -48,12 +48,6 @@ jobs:
       #   with:
       #     path: ${{ runner.temp }}/android-sdk
       #     key: ${{ runner.os }}-android-sdk
-      - name: Unset ANDROID_SDK_ROOT
-        run: |
-          unset ANDROID_SDK_ROOT
-
-      - name: Print environment variables
-        run: env                
 
       - name: Setup Android SDK Tools
         uses: android-actions/setup-android@v3.2.1
