@@ -93,7 +93,7 @@ jobs:
       - name: Build React Native app
         run: |
           cd android
-          ./run_gradlew.sh assembleReleaseBoth -I "init.gradle"
+          ./run_gradlew.sh assembleReleaseBoth
 
       - name: Archive APK
         uses: actions/upload-artifact@v3
