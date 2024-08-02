@@ -35,7 +35,7 @@ jobs:
         run: |
           cd ios
           xcodebuild -workspace "cicd.xcworkspace" -scheme cicd -configuration Release -sdk iphoneos -archivePath $PWD/build/cicd.xcarchive CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO archive
-          xcodebuild -exportArchive -archivePath $PWD/build/cicd.xcarchive -exportPath $PWD/build/ -exportOptionsPlist $PWD/cicd/Info.plist
+          xcodebuild -exportArchive -archivePath $PWD/build/cicd.xcarchive -exportPath $PWD/build/ -exportOptionsPlist $PWD/Info.plist CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
 
       - name: Upload IPA as an artifact
         uses: actions/upload-artifact@v3
@@ -58,7 +58,7 @@ jobs:
           context: ios_docker
           file: ios_docker/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/reactnative:signed_App_cache_fixed
+          tags: ${{ secrets.DOCKER_USERNAME }}/reactnative:unsigned_ios_no_cache_fixed
 
       - name: Logout from Docker Hub
         run: docker logout
