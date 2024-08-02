@@ -20,7 +20,8 @@ jobs:
 
       - name: Install dependencies
         run: yarn install
-
+      - name: Expo Prebuild
+        run: npx expo prebuild --no-install
       - name: Install CocoaPods
         run: |
           sudo gem install cocoapods
