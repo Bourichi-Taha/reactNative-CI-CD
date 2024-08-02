@@ -55,8 +55,14 @@ jobs:
 
       - name: Update Info.plist with Team ID
         run: |
+          # Print the plist to confirm the structure
+          /usr/libexec/PlistBuddy -c "Print" ios/cicd/Info.plist
+          
+          # Add the key if it does not exist
+          /usr/libexec/PlistBuddy -c "Add :DEVELOPMENT_TEAM string Y77YV74G86" ios/cicd/Info.plist || echo "Key already exists"
+          
+          # Set the key value
           /usr/libexec/PlistBuddy -c "Set :DEVELOPMENT_TEAM Y77YV74G86" ios/cicd/Info.plist
-
 
       - name: Build iOS app
         env:
