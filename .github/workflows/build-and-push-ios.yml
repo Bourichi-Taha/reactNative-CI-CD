@@ -53,16 +53,9 @@ jobs:
           cd ios
           pod install
 
-      - name: Update Info.plist with Team ID
+      - name: Update ExportOptions.plist
         run: |
-          # Print the plist to confirm the structure
-          /usr/libexec/PlistBuddy -c "Print" ios/cicd/Info.plist
-          
-          # Add the key if it does not exist
-          /usr/libexec/PlistBuddy -c "Add :DEVELOPMENT_TEAM string Y77YV74G86" ios/cicd/Info.plist || echo "Key already exists"
-          
-          # Set the key value
-          /usr/libexec/PlistBuddy -c "Set :DEVELOPMENT_TEAM Y77YV74G86" ios/cicd/Info.plist
+          /usr/libexec/PlistBuddy -c "Add :teamID string Y77YV74G86" ios/cicd/ExportOptions.plist || /usr/libexec/PlistBuddy -c "Set :teamID Y77YV74G86" ios/cicd/ExportOptions.plist
 
       - name: Build iOS app
         env:
@@ -83,7 +76,7 @@ jobs:
           xcodebuild -exportArchive \
             -archivePath $PWD/build/cicd.xcarchive \
             -exportPath $PWD/build/ \
-            -exportOptionsPlist $PWD/cicd/Info.plist \
+            -exportOptionsPlist $PWD/cicd/ExportOptions.plist \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO
