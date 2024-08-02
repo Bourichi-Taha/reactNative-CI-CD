@@ -46,7 +46,9 @@ jobs:
         run: npx expo prebuild
 
       - name: Check Info.plist
-        run: cat ios/Info.plist
+        run: |
+          cd ios
+          cat ios/Info.plist
       - name: Build iOS app
         run: |
           cd ios
