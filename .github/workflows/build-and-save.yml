@@ -3,7 +3,7 @@ name: Build and Push Docker Image
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   build:
@@ -21,17 +21,17 @@ jobs:
       - name: Install essential utilities
         run: |
           sudo apt-get update
-          sudo apt-get install -y wget
+          sudo apt-get install -y coreutils findutils unzip wget
 
-      - name: Cache Node.js modules
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.yarn/cache
-            node_modules
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
+      # - name: Cache yarn dependencies
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: |
+      #       ~/.yarn/cache
+      #       node_modules
+      #     key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-yarn-
 
       - name: Install dependencies
         run: yarn install
@@ -42,11 +42,12 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Cache Android SDK
-        uses: actions/cache@v3
-        with:
-          path: ${{ runner.temp }}/android-sdk
-          key: ${{ runner.os }}-android-sdk
+      # - name: Cache Android SDK
+      #   id: cache-android-sdk
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: ${{ runner.temp }}/android-sdk
+      #     key: ${{ runner.os }}-android-sdk
 
       - name: Setup Android SDK Tools
         uses: android-actions/setup-android@v3.2.1
@@ -74,21 +75,12 @@ jobs:
           path: android/app/build/outputs/apk/release/app-release.apk
 
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/reactnative:emptyApp/cache
-
-      - name: Logout from Docker Hub
-        run: docker logout
+      - name: Commit and push APK to repo
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git checkout -b apks # Ensure we're on a new branch
+          cp android/app/build/outputs/apk/release/app-release.apk ./apks/app-release-$(date +'%Y%m%d%H%M%S').apk
+          git add ./apks/
+          git commit -m "Add APK from build ${{ github.run_id }}"
+          git push origin apks
