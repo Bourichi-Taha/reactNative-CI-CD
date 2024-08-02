@@ -1,0 +1,13 @@
+gradle.taskGraph.whenReady { taskGraph ->
+  def totalTasks = taskGraph.allTasks.size()
+  def completedTasks = 0
+
+  gradle.taskGraph.afterTask { Task task, TaskState state ->
+      if (state.executed) {
+          completedTasks++
+          def progress = (completedTasks / totalTasks) * 100
+          def taskType = (gradle.taskGraph.hasTask(":jar") && gradle.taskGraph.hasTask(":checkKotlinGradlePluginConfigurationErrors") && gradle.taskGraph.hasTask(":pluginDescriptors") && gradle.taskGraph.hasTask(":processResources") && gradle.taskGraph.hasTask(":compileKotlin")) ? "Configuration" : "Building"
+          println "\${taskType}: \${task.path} - \${state.didWork ? "COMPLETED" : "SKIPPED"} - Progress: \${String.format("%.2f", progress)}%"
+      }
+  }
+}
