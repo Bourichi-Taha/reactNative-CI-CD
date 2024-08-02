@@ -52,24 +52,11 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-       # Restore the cache before downloading Android SDK components
-      - name: Restore Android SDK cache
-        id: sdk-cache
-        uses: actions/cache@v3
-        with:
-          path: /usr/local/lib/android/sdk
-          key: ${{ runner.os }}-android-sdk
+       
       # setting up Android SDK Tools if no cache
       - name: Setup Android SDK Tools
         if: steps.sdk-cache.outputs.cache-hit != 'true'
         uses: android-actions/setup-android@v3.2.1
-      # Save the cache after setting up Android SDK Tools
-      - name: Cache Android SDK
-        if: steps.sdk-cache.outputs.cache-hit != 'true'
-        uses: actions/cache@v3
-        with:
-          path: /usr/local/lib/android/sdk
-          key: ${{ runner.os }}-android-sdk
 
       - name: Prebuild app
         run: npx expo prebuild --no-install
@@ -89,6 +76,16 @@ jobs:
           echo 'export PATH=/usr/bin:$PATH' >> run_gradlew.sh
           echo './gradlew "$@"' >> run_gradlew.sh
           chmod +x run_gradlew.sh
+
+      - name: Cache Gradle dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-build
+          restore-keys: |
+            ${{ runner.os }}-gradle-build
           
       - name: Build React Native app
         run: |
