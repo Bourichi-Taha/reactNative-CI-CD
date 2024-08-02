@@ -24,6 +24,7 @@ jobs:
           sudo apt-get install -y wget
       # Restore cache before installing dependencies
       - name: Cache Node.js modules
+        id: yarn-cache
         uses: actions/cache@v3
         with:
           path: |
@@ -34,9 +35,11 @@ jobs:
             ${{ runner.os }}-yarn-
       #  installing dependencies if no cache
       - name: Install dependencies
+        if: steps.yarn-cache.outputs.cache-hit != 'true'
         run: yarn install
       # Save the cache after dependencies have been installed
       - name: Cache Node.js modules
+        if: steps.yarn-cache.outputs.cache-hit != 'true'
         uses: actions/cache@v3
         with:
           path: |
@@ -51,15 +54,18 @@ jobs:
 
        # Restore the cache before downloading Android SDK components
       - name: Restore Android SDK cache
+        id: sdk-cache
         uses: actions/cache@v3
         with:
           path: ${{ runner.tool_cache }}/android-sdk
           key: ${{ runner.os }}-android-sdk
       # setting up Android SDK Tools if no cache
       - name: Setup Android SDK Tools
+        if: steps.sdk-cache.outputs.cache-hit != 'true'
         uses: android-actions/setup-android@v3.2.1
       # Save the cache after setting up Android SDK Tools
       - name: Cache Android SDK
+        if: steps.sdk-cache.outputs.cache-hit != 'true'
         uses: actions/cache@v3
         with:
           path: ${{ runner.tool_cache }}/android-sdk
@@ -102,7 +108,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/reactnative:emptyApp_cache
+          tags: ${{ secrets.DOCKER_USERNAME }}/reactnative:emptyApp_cache_fixed
 
       - name: Logout from Docker Hub
         run: docker logout
