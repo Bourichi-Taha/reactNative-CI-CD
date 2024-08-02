@@ -24,11 +24,17 @@ jobs:
       - name: Expo Prebuild
         run: npx expo prebuild --no-install
 
+      - name: List files after prebuild
+        run: ls -R
+
       - name: Install CocoaPods
         run: |
           sudo gem install cocoapods
           cd ios
           pod install
+
+      - name: List files after pod install
+        run: ls -R ios
 
       - name: Verify .xcworkspace exists
         run: ls ios/YourApp.xcworkspace
@@ -60,7 +66,7 @@ jobs:
           context: ios_docker
           file: ios_docker/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/reactnative:ios_no_cache
+          tags: ${{ secrets.DOCKER_USERNAME }}/reactnative:signed_App_cache_fixed
 
       - name: Logout from Docker Hub
         run: docker logout
