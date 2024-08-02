@@ -36,13 +36,22 @@ jobs:
       - name: List files after pod install
         run: ls -R ios
 
-      - name: Verify .xcworkspace exists
-        run: ls ios/YourApp.xcworkspace
+      - name: Find .xcworkspace
+        id: find-workspace
+        run: |
+          cd ios
+          workspace=$(find . -name "*.xcworkspace" | head -n 1)
+          if [ -z "$workspace" ]; then
+            echo "No .xcworkspace file found"
+            exit 1
+          fi
+          echo "::set-output name=workspace::$workspace"
 
       - name: Build iOS app
         run: |
           cd ios
-          xcodebuild -workspace YourApp.xcworkspace -scheme YourApp -configuration Release -sdk iphoneos -archivePath $PWD/build/YourApp.xcarchive archive
+          workspace=${{ steps.find-workspace.outputs.workspace }}
+          xcodebuild -workspace "$workspace" -scheme YourApp -configuration Release -sdk iphoneos -archivePath $PWD/build/YourApp.xcarchive archive
           xcodebuild -exportArchive -archivePath $PWD/build/YourApp.xcarchive -exportPath $PWD/build/ -exportOptionsPlist $PWD/YourApp/Info.plist
 
       - name: Upload IPA as an artifact
