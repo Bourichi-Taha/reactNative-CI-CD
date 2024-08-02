@@ -83,9 +83,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.overlordrr.cicd"
+    namespace 'com.overlordrr.cicd'
     defaultConfig {
-        applicationId "com.overlordrr.cicd"
+        applicationId 'com.overlordrr.cicd'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
