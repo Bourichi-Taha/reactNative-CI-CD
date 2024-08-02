@@ -17,6 +17,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18
+
       - name: Cache Node.js modules
         id: yarn-cache
         uses: actions/cache@v3
@@ -27,32 +28,54 @@ jobs:
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
-      
+
       - name: Install dependencies
         if: steps.yarn-cache.outputs.cache-hit != 'true'
         run: yarn install
-
-      - name: Cache Node.js modules
-        if: steps.yarn-cache.outputs.cache-hit != 'true'
+      - name: Cache CocoaPods
+        id: pod-cache
         uses: actions/cache@v3
         with:
           path: |
-            ~/.yarn/cache
-            node_modules
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+            ios/Pods
+            ios/Podfile.lock
+          key: ${{ runner.os }}-pods-${{ hashFiles('ios/Podfile.lock') }}
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-pods-
+
+      - name: Install CocoaPods dependencies
+        if: steps.pod-cache.outputs.cache-hit != 'true'
+        run: |
+          cd ios
+          pod install
       - name: Expo Prebuild
         run: npx expo prebuild
 
       - name: Check Info.plist
-        run: |
-          cat ios/cicd/Info.plist
+        run: cat ios/cicd/Info.plist
+
       - name: Build iOS app
+        env:
+          DEVELOPER_DIR: /Applications/Xcode.app/Contents/Developer
         run: |
           cd ios
-          xcodebuild -workspace "cicd.xcworkspace" -scheme cicd -configuration Release -sdk iphoneos -archivePath $PWD/build/cicd.xcarchive CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO archive
-          xcodebuild -exportArchive -archivePath $PWD/build/cicd.xcarchive -exportPath $PWD/build/ -exportOptionsPlist $PWD/cicd/Info.plist CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
+          xcodebuild -workspace "cicd.xcworkspace" \
+            -scheme cicd \
+            -configuration Release \
+            -sdk iphoneos \
+            -archivePath $PWD/build/cicd.xcarchive \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            archive
+          
+          xcodebuild -exportArchive \
+            -archivePath $PWD/build/cicd.xcarchive \
+            -exportPath $PWD/build/ \
+            -exportOptionsPlist $PWD/cicd/Info.plist \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO
 
       - name: Upload IPA as an artifact
         uses: actions/upload-artifact@v3
