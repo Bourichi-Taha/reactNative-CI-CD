@@ -18,7 +18,7 @@ jobs:
         with:
           node-version: 18
 
-      - name: Cache Node.js modules
+      - name: Cache Yarn
         id: yarn-cache
         uses: actions/cache@v3
         with:
@@ -32,6 +32,10 @@ jobs:
       - name: Install dependencies
         if: steps.yarn-cache.outputs.cache-hit != 'true'
         run: yarn install
+
+      - name: Expo Prebuild
+        run: npx expo prebuild --platform ios --skip-dependency-update
+
       - name: Cache CocoaPods
         id: pod-cache
         uses: actions/cache@v3
@@ -42,17 +46,12 @@ jobs:
           key: ${{ runner.os }}-pods-${{ hashFiles('ios/Podfile.lock') }}
           restore-keys: |
             ${{ runner.os }}-pods-
-
+      
       - name: Install CocoaPods dependencies
         if: steps.pod-cache.outputs.cache-hit != 'true'
         run: |
           cd ios
           pod install
-      - name: Expo Prebuild
-        run: npx expo prebuild
-
-      - name: Check Info.plist
-        run: cat ios/cicd/Info.plist
 
       - name: Build iOS app
         env:
