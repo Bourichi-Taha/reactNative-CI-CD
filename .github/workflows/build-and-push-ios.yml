@@ -1,0 +1,58 @@
+name: Build and Push Docker Image ios
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Install CocoaPods
+        run: |
+          sudo gem install cocoapods
+          pod install --project-directory=ios
+
+      - name: Build iOS app
+        run: |
+          cd ios
+          xcodebuild -workspace YourApp.xcworkspace -scheme YourApp -configuration Release -sdk iphoneos -archivePath $PWD/build/YourApp.xcarchive archive
+          xcodebuild -exportArchive -archivePath $PWD/build/YourApp.xcarchive -exportPath $PWD/build/ -exportOptionsPlist $PWD/YourApp/Info.plist
+
+      - name: Upload IPA as an artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: YourApp.ipa
+          path: ios/build/YourApp.ipa
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/reactnative:signed_App_cache_fixed
+
+      - name: Logout from Docker Hub
+        run: docker logout
