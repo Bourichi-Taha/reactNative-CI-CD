@@ -17,25 +17,41 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18
-
+      - name: Cache Node.js modules
+        id: yarn-cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.yarn/cache
+            node_modules
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      
       - name: Install dependencies
+        if: steps.yarn-cache.outputs.cache-hit != 'true'
         run: yarn install
 
+      - name: Cache Node.js modules
+        if: steps.yarn-cache.outputs.cache-hit != 'true'
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.yarn/cache
+            node_modules
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
       - name: Expo Prebuild
         run: npx expo prebuild
 
-
-      - name: Install CocoaPods
-        run: |
-          sudo gem install cocoapods
-          cd ios
-          pod install
-
+      - name: Check Info.plist
+        run: cat ios/Info.plist
       - name: Build iOS app
         run: |
           cd ios
           xcodebuild -workspace "cicd.xcworkspace" -scheme cicd -configuration Release -sdk iphoneos -archivePath $PWD/build/cicd.xcarchive CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO archive
-          xcodebuild -exportArchive -archivePath $PWD/build/cicd.xcarchive -exportPath $PWD/build/ CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
+          xcodebuild -exportArchive -archivePath $PWD/build/cicd.xcarchive -exportPath $PWD/build/ -exportOptionsPlist $PWD/Info.plist CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
 
       - name: Upload IPA as an artifact
         uses: actions/upload-artifact@v3
