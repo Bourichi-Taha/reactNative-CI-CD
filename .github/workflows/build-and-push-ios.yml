@@ -53,6 +53,11 @@ jobs:
           cd ios
           pod install
 
+      - name: Update Info.plist with Team ID
+        run: |
+          /usr/libexec/PlistBuddy -c "Set :DEVELOPMENT_TEAM Y77YV74G86" ios/cicd/Info.plist
+
+
       - name: Build iOS app
         env:
           DEVELOPER_DIR: /Applications/Xcode.app/Contents/Developer
@@ -63,7 +68,7 @@ jobs:
             -configuration Release \
             -sdk iphoneos \
             -archivePath $PWD/build/cicd.xcarchive \
-            DEVELOPMENT_TEAM="" \
+            DEVELOPMENT_TEAM="Y77YV74G86" \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO \
