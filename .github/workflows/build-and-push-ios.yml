@@ -22,10 +22,8 @@ jobs:
         run: yarn install
 
       - name: Expo Prebuild
-        run: npx expo prebuild --no-install
+        run: npx expo prebuild
 
-      - name: List files after prebuild
-        run: ls -R
 
       - name: Install CocoaPods
         run: |
@@ -33,32 +31,17 @@ jobs:
           cd ios
           pod install
 
-      - name: List files after pod install
-        run: ls -R ios
-
-      - name: Find .xcworkspace
-        id: find-workspace
-        run: |
-          cd ios
-          workspace=$(find . -name "*.xcworkspace" | head -n 1)
-          if [ -z "$workspace" ]; then
-            echo "No .xcworkspace file found"
-            exit 1
-          fi
-          echo "::set-output name=workspace::$workspace"
-
       - name: Build iOS app
         run: |
           cd ios
-          workspace=${{ steps.find-workspace.outputs.workspace }}
-          xcodebuild -workspace "$workspace" -scheme YourApp -configuration Release -sdk iphoneos -archivePath $PWD/build/YourApp.xcarchive archive
-          xcodebuild -exportArchive -archivePath $PWD/build/YourApp.xcarchive -exportPath $PWD/build/ -exportOptionsPlist $PWD/YourApp/Info.plist
+          xcodebuild -workspace "cicd.xcworkspace" -scheme cicd -configuration Release -sdk iphoneos -archivePath $PWD/build/cicd.xcarchive archive
+          xcodebuild -exportArchive -archivePath $PWD/build/cicd.xcarchive -exportPath $PWD/build/ -exportOptionsPlist $PWD/cicd/Info.plist
 
       - name: Upload IPA as an artifact
         uses: actions/upload-artifact@v3
         with:
-          name: YourApp.ipa
-          path: ios/build/YourApp.ipa
+          name: cicd.ipa
+          path: ios/build/cicd.ipa
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
