@@ -34,7 +34,7 @@ jobs:
         run: yarn install
 
       - name: Expo Prebuild
-        run: npx expo prebuild --platform ios --skip-dependency-update
+        run: npx expo prebuild --platform ios --no-install
 
       - name: Cache CocoaPods
         id: pod-cache
