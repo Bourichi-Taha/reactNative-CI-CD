@@ -64,7 +64,7 @@ jobs:
           echo '  <key>signingStyle</key>' >> ios/cicd/ExportOptions.plist
           echo '  <string>manual</string>' >> ios/cicd/ExportOptions.plist
           echo '  <key>teamID</key>' >> ios/cicd/ExportOptions.plist
-          echo '  <string></string>' >> ios/cicd/ExportOptions.plist
+          echo '  <string>TTTTTTTT00</string>' >> ios/cicd/ExportOptions.plist
           echo '  <key>provisioningProfiles</key>' >> ios/cicd/ExportOptions.plist
           echo '  <dict>' >> ios/cicd/ExportOptions.plist
           echo '    <key>com.overlordrr.cicd</key>' >> ios/cicd/ExportOptions.plist
