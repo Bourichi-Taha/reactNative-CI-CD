@@ -53,53 +53,23 @@ jobs:
           cd ios
           pod install
 
-      - name: Build iOS app without signing
+      - name: Build iOS app for simulator without signing
         env:
           DEVELOPER_DIR: /Applications/Xcode.app/Contents/Developer
         run: |
           cd ios
           xcodebuild -workspace "cicd.xcworkspace" \
             -scheme cicd \
-            -configuration Release \
-            -sdk iphoneos \
-            -archivePath $PWD/build/cicd.xcarchive \
-            CODE_SIGN_IDENTITY="" \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO \
-            archive
-
-      - name: Create ExportOptions.plist for unsigned build
-        run: |
-          echo '<?xml version="1.0" encoding="UTF-8"?>' > ios/cicd/ExportOptions.plist
-          echo '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">' >> ios/cicd/ExportOptions.plist
-          echo '<plist version="1.0">' >> ios/cicd/ExportOptions.plist
-          echo '<dict>' >> ios/cicd/ExportOptions.plist
-          echo '  <key>method</key>' >> ios/cicd/ExportOptions.plist
-          echo '  <string>development</string>' >> ios/cicd/ExportOptions.plist
-          echo '  <key>signingStyle</key>' >> ios/cicd/ExportOptions.plist
-          echo '  <string>manual</string>' >> ios/cicd/ExportOptions.plist
-          echo '  <key>provisioningProfiles</key>' >> ios/cicd/ExportOptions.plist
-          echo '  <dict>' >> ios/cicd/ExportOptions.plist
-          echo '    <key>com.overlordrr.cicd</key>' >> ios/cicd/ExportOptions.plist
-          echo '    <string></string>' >> ios/cicd/ExportOptions.plist
-          echo '  </dict>' >> ios/cicd/ExportOptions.plist
-          echo '</dict>' >> ios/cicd/ExportOptions.plist
-          echo '</plist>' >> ios/cicd/ExportOptions.plist
-
-      - name: Export unsigned IPA (optional)
-        run: |
-          cd ios
-          xcodebuild -exportArchive \
-            -archivePath $PWD/build/cicd.xcarchive \
-            -exportPath $PWD/build/ \
-            -exportOptionsPlist $PWD/cicd/ExportOptions.plist \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -derivedDataPath build \
             CODE_SIGNING_ALLOWED=NO
 
-      - name: Upload Archive as an artifact
+      - name: Upload app as an artifact (optional)
         uses: actions/upload-artifact@v3
         with:
-          name: cicd.xcarchive
-          path: ios/build/cicd.xcarchive
+          name: cicd.app
+          path: ios/build/Build/Products/Debug-iphonesimulator/cicd.app
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
