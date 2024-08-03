@@ -1,5 +1,5 @@
 # Stage 1: Build the APK
-FROM scratch
+FROM alpine
 
 # Set working directory
 WORKDIR /app
