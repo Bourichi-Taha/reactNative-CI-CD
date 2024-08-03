@@ -11,4 +11,4 @@ COPY . /app
 
 
 
-CMD ["sleep", "infinity"]
+CMD ["tail", "-f", "/dev/null"]
