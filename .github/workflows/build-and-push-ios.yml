@@ -67,8 +67,8 @@ jobs:
       - name: Upload app as an artifact
         uses: actions/upload-artifact@v3
         with:
-          name: cicd.app
-          path: ios/build/Build/Products/Debug-iphonesimulator/cicd.app
+          name: ios
+          path: ios/
 
   build_docker:
     runs-on: ubuntu-latest
@@ -81,8 +81,8 @@ jobs:
       - name: Download iOS App artifact
         uses: actions/download-artifact@v3
         with:
-          name: cicd.app
-          path: ios/build/Build/Products/Debug-iphonesimulator
+          name: ios
+          path: ios/
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
