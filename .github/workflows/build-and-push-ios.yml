@@ -37,17 +37,14 @@ jobs:
         run: npx expo prebuild --platform ios --no-install
 
       - name: Cache CocoaPods
-        id: pod-cache
-        uses: actions/cache@v3
+        uses: actions/cache@v2
         with:
-          path: |
-            ios/Pods
-            ios/Podfile.lock
-          key: ${{ runner.os }}-pods-${{ hashFiles('ios/Podfile.lock') }}
+          path: ios/Pods
+          key: ${{ runner.os }}-pods-${{ hashFiles('Podfile.lock') }}
           restore-keys: |
             ${{ runner.os }}-pods-
 
-      - name: Install CocoaPods dependencies
+      - name: Install CocoaPods
         run: |
           cd ios
           pod install
@@ -63,9 +60,6 @@ jobs:
             -sdk iphonesimulator \
             -derivedDataPath build \
             CODE_SIGNING_ALLOWED=NO
-
-      - name: Verify iOS app artifact path
-        run: ls -l ios/build/Build/Products/Debug-iphonesimulator/cicd.app
 
       - name: Upload app as an artifact
         uses: actions/upload-artifact@v3
