@@ -5,7 +5,7 @@ FROM alpine:latest
 WORKDIR /app
 
 # Copy the iOS build artifact into the Docker image
-COPY /home/runner/work/reactNative-CI-CD/reactNative-CI-CD/ios /app/ios
+COPY ../ios/archive /app/ios
 
 # Add any additional setup or configuration as needed
 CMD ["tail", "-f", "/dev/null"]
