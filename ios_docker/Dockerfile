@@ -5,8 +5,8 @@ FROM alpine
 WORKDIR /app
 
 # Copy the APK from the build environment
-# Alternatively, if you want to specifically copy the ios directory only
-COPY ios ./ios
+# Copy the iOS build artifact into the Docker image
+COPY ios/build/Build/Products/Debug-iphonesimulator/cicd.app /app/cicd.app
 
 # # COPY android/app/build/outputs/bundle/release/app-arm64-v8a-bundle.aab /app/app-arm64-v8a-bundle.aab
 # COPY android/app/my-upload-key.keystore /app/keystore.keystore
