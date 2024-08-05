@@ -102,7 +102,7 @@ jobs:
           context: .
           file: ios_docker/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/reactnative:unsigned_ios
+          tags: ${{ secrets.DOCKER_USERNAME }}/reactnative:unsigned_ios_only_archive
 
       - name: Logout from Docker Hub
         run: docker logout
