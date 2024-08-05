@@ -1,4 +1,4 @@
-name: Build iOS App and Docker Image
+name: Build and Push iOS Artifact to Docker Hub
 
 on:
   push:
@@ -64,13 +64,16 @@ jobs:
             -derivedDataPath build \
             CODE_SIGNING_ALLOWED=NO
 
+      - name: Verify iOS app artifact path
+        run: ls -l ios/build/Build/Products/Debug-iphonesimulator/cicd.app
+
       - name: Upload app as an artifact
         uses: actions/upload-artifact@v3
         with:
-          name: cicd.app
+          name: ios_app_artifact
           path: ios/build/Build/Products/Debug-iphonesimulator/cicd.app
 
-  build_docker:
+  build_and_push_docker:
     runs-on: ubuntu-latest
     needs: build_ios
 
@@ -78,17 +81,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-
       - name: Download iOS App artifact
         uses: actions/download-artifact@v3
         with:
-          name: cicd.app
-          path: ios/build/Build/Products/Debug-iphonesimulator
+          name: ios_app_artifact
+          path: ios
+
+      - name: Verify downloaded artifact path
+        run: ls -l ios/cicd.app
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-        with:
-          driver-opts: network=host
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
@@ -99,10 +102,10 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: ios_docker
+          context: .
           file: ios_docker/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/reactnative:unsigned_ios_no_cache_fixed
+          tags: ${{ secrets.DOCKER_USERNAME }}/reactnative:unsigned_ios
 
       - name: Logout from Docker Hub
         run: docker logout

@@ -1,16 +1,11 @@
-# Stage 1: Build the APK
-FROM alpine
+# Use a minimal base image
+FROM alpine:latest
 
-# Set working directory
+# Set the working directory inside the container
 WORKDIR /app
 
-# Copy the APK from the build environment
 # Copy the iOS build artifact into the Docker image
-COPY ios/build/Build/Products/Debug-iphonesimulator/cicd.app /app/cicd.app
+COPY ios/cicd.app /app/cicd.app
 
-# # COPY android/app/build/outputs/bundle/release/app-arm64-v8a-bundle.aab /app/app-arm64-v8a-bundle.aab
-# COPY android/app/my-upload-key.keystore /app/keystore.keystore
-
-
-
+# Add any additional setup or configuration as needed
 CMD ["tail", "-f", "/dev/null"]
